@@ -1,0 +1,10 @@
+=> 
+[32m#<Testimonial:0x00007d6d792ffad0[0m
+ id: [34m[1m1[0m,
+ quote: [31m[1m"[0m[31mJoining FitLife has completely transformed my fitn...[0m[31m[1m"[0m,
+ author: [31m[1m"[0m[31mSarah Johnson[0m[31m[1m"[0m,
+ role: [31m[1m"[0m[31mMember for 2 years[0m[31m[1m"[0m,
+ image: [31m[1m"[0m[31mhttps://plus.unsplash.com/premium_photo-1691784781...[0m[31m[1m"[0m,
+ rating: [34m[1m5[0m,
+ created_at: [31m[1m"[0m[31m2025-11-11 14:39:03.124651000 +0000[0m[31m[1m"[0m,
+ updated_at: [31m[1m"[0m[31m2025-11-11 14:39:03.124651000 +0000[0m[31m[1m"[0m[32m>[0m
