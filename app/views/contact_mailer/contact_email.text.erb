@@ -1,0 +1,10 @@
+// app/views/contact_mailer/contact_email.text.erb
+
+You've received a new contact form message.
+
+From: <%= @data["name"] %> (<%= @data["email"] %>)
+Phone: <%= @data["phone"] %>
+Subject: <%= @data["subject"] %>
+
+Message:
+<%= @data["message"] %>
