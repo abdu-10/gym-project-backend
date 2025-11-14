@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_11_142609) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_14_123244) do
+  create_table "plans", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "features"
+    t.string "name"
+    t.string "period"
+    t.boolean "popular"
+    t.string "price"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "testimonials", force: :cascade do |t|
     t.string "author"
     t.datetime "created_at", null: false
@@ -18,6 +28,14 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_11_142609) do
     t.string "quote"
     t.integer "rating"
     t.string "role"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.string "password_digest"
     t.datetime "updated_at", null: false
   end
 end

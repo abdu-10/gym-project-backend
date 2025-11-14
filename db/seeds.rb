@@ -55,3 +55,61 @@ end
 
 puts "Finished!"
 puts "Created #{Testimonial.count} testimonials."
+
+# plans
+
+puts "Cleaning Plans table..."
+Plan.destroy_all
+
+puts "Creating membership plans..."
+
+plans_data = [
+  {
+    name: 'Basic',
+    price: '$29',
+    period: 'per month',
+    features: [
+      'Gym Access (6 AM - 10 PM)',
+      'Basic fitness equipment',
+      'Locker room access',
+      '2 group classes per week',
+      'Free fitness assessment',
+    ],
+    popular: false
+  },
+  {
+    name: 'Premium',
+    price: '$59',
+    period: 'per month',
+    features: [
+      '24/7 Gym Access',
+      'Full equipment access',
+      'unlimited group classes',
+      '1 free PT session per month',
+      'Nutrition consultation',
+      'Access to sauna and spa',
+    ],
+    popular: true
+  },
+  {
+    name: 'Elite',
+    price: '$99',
+    period: 'per month',
+    features: [
+      '24/7 gym access',
+      'Full equipment access',
+      'Unlimited group classes',
+      '4 PT sessions per month',
+      'Monthly body composition analysis',
+      'Personalized nutrition plan',
+      'Access to all amenities',
+    ],
+    popular: false
+  }
+]
+
+plans_data.each do |plan_data|
+  Plan.create!(plan_data)
+end
+
+puts "Created #{Plan.count} plans."
