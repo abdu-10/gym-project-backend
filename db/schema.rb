@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_14_124010) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_193407) do
   create_table "memberships", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "plan_id", null: false
@@ -27,6 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_14_124010) do
     t.string "period"
     t.boolean "popular"
     t.string "price"
+    t.integer "price_in_cents"
     t.datetime "updated_at", null: false
   end
 

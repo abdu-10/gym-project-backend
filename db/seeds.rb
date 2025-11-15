@@ -67,6 +67,7 @@ plans_data = [
   {
     name: 'Basic',
     price: '$29',
+    price_in_cents: 2900,
     period: 'per month',
     features: [
       'Gym Access (6 AM - 10 PM)',
@@ -80,6 +81,7 @@ plans_data = [
   {
     name: 'Premium',
     price: '$59',
+    price_in_cents: 5900,
     period: 'per month',
     features: [
       '24/7 Gym Access',
@@ -94,6 +96,7 @@ plans_data = [
   {
     name: 'Elite',
     price: '$99',
+    price_in_cents: 2900,
     period: 'per month',
     features: [
       '24/7 gym access',
