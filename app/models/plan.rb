@@ -1,8 +1,8 @@
 class Plan < ApplicationRecord
 
-    serialize :features, Array
+   attribute :features, :json, default: []
 
 
     has_many :memberships
-    
+
 end
