@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "/plans", to: "plans#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -20,6 +21,8 @@ end
   resources :testimonials, only: [:index, :show, :create, :update, :destroy]
   
 resources :contacts, only: [:create]
+
+post "/registrations", to: "registrations#create"
 
   # Defines the root path route ("/")
   # root "posts#index"
