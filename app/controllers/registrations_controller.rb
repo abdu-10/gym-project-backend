@@ -51,6 +51,10 @@ class RegistrationsController < ApplicationController
       #    create the User in *our* database.
       @user = User.create!(account_params)
 
+      # --- SECURITY UPGRADE ---
+      # Log them in immediately by setting the cookie
+      session[:user_id] = @user.id
+
       # 8. And create the Membership to link them.
       @membership = Membership.create!(
         user: @user,
@@ -60,10 +64,15 @@ class RegistrationsController < ApplicationController
       # 9. If we get here, EVERYTHING worked!
       render json: { 
         message: "User and membership created successfully!",
-        user: { id: @user.id, name: @user.name, email: @user.email },
+        user: { 
+          id: @user.id, 
+          name: @user.name, 
+          email: @user.email,
+          joined_at: @user.created_at 
+        },
         membership: { plan: @membership.plan.name }
       }, status: :created
-    end
+    end # End of transaction block
 
   # --- NEW ERROR CATCHING ---
 
@@ -106,7 +115,7 @@ class RegistrationsController < ApplicationController
         :method,
         :nameOnCard,
         :mpesaPhone,
-        :stripe_token  # <-- We now accept the secret token
+        :stripe_token  
       ]
     )
   end
