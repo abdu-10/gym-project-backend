@@ -2,8 +2,10 @@ require_relative "boot"
 
 require "rails/all"
 
+# --- KEEPING YOUR FIX FOR THE EMAIL ERROR ---
 require 'uri'
 URI.singleton_class.send(:alias_method, :encode, :encode_www_form_component) unless URI.respond_to?(:encode)
+# -------------------------------------------
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -20,11 +22,18 @@ module GymProject
     config.autoload_lib(ignore: %w[assets tasks])
 
     # Configuration for the application, engines, and railties goes here.
-    #
-    # These settings can be overridden in specific environments using the files
-    # in config/environments, which are processed later.
-    #
-    # config.time_zone = "Central Time (US & Canada)"
-    # config.eager_load_paths << Rails.root.join("extras")
+    
+    # --- SECURITY UPGRADE: ENABLE COOKIES ---
+    # 1. Ensure we are in API mode
+    config.api_only = true
+
+    # 2. Manually add back the middleware for Cookies and Sessions.
+    #    (Rails API removes these by default, but we need them for HttpOnly auth).
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore, key: '_gym_project_session'
+    
+    # 3. Strict protection so other sites can't steal our cookies
+    config.action_dispatch.cookies_same_site_protection = :strict
+    # ----------------------------------------
   end
 end
