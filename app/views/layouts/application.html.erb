@@ -23,6 +23,67 @@
     <%= javascript_importmap_tags %>
   </head>
 
+  <style>
+    /* 1. Sidebar Background - Dark Grey */
+    .navigation {
+      background-color: #111827; /* gray-900 */
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 1rem;
+    }
+
+    /* 2. Sidebar Links - Light Grey */
+    .navigation__link {
+      color: #9CA3AF; /* gray-400 */
+      padding: 10px 20px;
+      transition: all 0.2s;
+    }
+
+    /* 3. Hover Effect */
+    .navigation__link:hover {
+      color: white;
+      background-color: #1F2937; /* gray-800 */
+    }
+
+    /* 4. Active Link (Current Page) - FitElite Red Border */
+    .navigation__link--active {
+      color: white;
+      border-left: 4px solid #DC2626; /* red-600 */
+      background-color: #1F2937;
+      padding-left: 16px; /* Adjust for the border */
+    }
+    
+    /* 5. The Logo Container */
+    .navigation__link--home {
+      color: white !important;
+      border-bottom: 1px solid #374151;
+      margin-bottom: 1rem;
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    .navigation__link--home:hover {
+      background-color: transparent;
+    }
+
+    /* 6. Main Content Background */
+    .main-content {
+      background-color: #F3F4F6; /* gray-100 */
+    }
+    
+    /* 7. Primary Buttons - FitElite Red */
+    .button, .form-actions .button {
+      background-color: #DC2626;
+      border-color: #DC2626;
+      color: white;
+    }
+    .button:hover {
+      background-color: #B91C1C; /* darker red */
+    }
+  </style>
+
+</head>
+
   <body>
     <%= yield %>
   </body>

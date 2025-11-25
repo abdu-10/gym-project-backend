@@ -1,0 +1,27 @@
+<%#
+# Navigation
+# We have customized this to show the FITELITE logo
+%>
+
+<nav class="navigation">
+  <%# --- 1. The Custom Logo --- %>
+  <%= link_to admin_root_path, class: "navigation__link navigation__link--home" do %>
+    <span style="font-weight: 800; font-size: 1.2rem; letter-spacing: 1px;">
+      FIT<span style="color: #DC2626;">ELITE</span> STAFF
+    </span>
+  <% end %>
+
+  <%# --- 2. The Standard Menu Links --- %>
+  <% Administrate::Namespace.new(namespace).resources_with_index_route.each do |resource| %>
+    <%= link_to(
+      display_resource_name(resource),
+      resource_index_route(resource),
+      class: "navigation__link navigation__link--#{nav_link_state(resource)}"
+    ) if accessible_action?(model_from_resource(resource), :index) %>
+  <% end %>
+
+  <%# --- 3. A "Back to Website" Link at the bottom --- %>
+  <%= link_to root_url, class: "navigation__link", style: "margin-top: auto; border-top: 1px solid #374151; color: #6B7280; font-size: 0.9rem;" do %>
+    &larr; Back to Website
+  <% end if defined?(root_url) %>
+</nav>
