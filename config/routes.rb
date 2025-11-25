@@ -1,4 +1,13 @@
 Rails.application.routes.draw do
+  get "access/verify"
+  namespace :admin do
+      resources :memberships
+      resources :plans
+      resources :testimonials
+      resources :users
+
+      root to: "memberships#index"
+    end
   get "/plans", to: "plans#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -23,6 +32,16 @@ end
 resources :contacts, only: [:create]
 
 post "/registrations", to: "registrations#create"
+# The Login Route
+  post "/login", to: "sessions#create"
+
+  # The Bouncer's Door
+  post "/access/verify", to: "access#verify"
+
+  # Session Routes
+  post "/login", to: "sessions#create"
+  delete "/logout", to: "sessions#destroy" # Log out
+  get "/me", to: "sessions#me"             # Check "Who am I?" on refresh
 
   # Defines the root path route ("/")
   # root "posts#index"
