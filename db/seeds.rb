@@ -58,6 +58,12 @@ puts "Created #{Testimonial.count} testimonials."
 
 # plans
 
+
+puts "Cleaning join tables..."
+Membership.destroy_all
+User.destroy_all # Let's also clean up the Postman test user
+
+
 puts "Cleaning Plans table..."
 Plan.destroy_all
 
@@ -66,48 +72,50 @@ puts "Creating membership plans..."
 plans_data = [
   {
     name: 'Basic',
-    price: '$29',
-    price_in_cents: 2900,
-    period: 'per month',
+    price: '$49',           # Display Price
+    price_in_cents: 4900,   # Stripe Price ($49.00)
+    period: '1 Month',
+    popular: false,
     features: [
-      'Gym Access (6 AM - 10 PM)',
-      'Basic fitness equipment',
-      'Locker room access',
-      '2 group classes per week',
-      'Free fitness assessment',
-    ],
-    popular: false
+      '24/7 Gym Access',
+      'Access to Heated Pool & Spa',
+      'Access to Padel Courts',
+      '1 Free PT Session',
+      'Free Fitness Assessment',
+      'Locker Room & Showers'
+    ]
   },
   {
     name: 'Premium',
-    price: '$59',
-    price_in_cents: 5900,
-    period: 'per month',
+    price: '$249',          # Saves them $45 compared to monthly
+    price_in_cents: 24900,  # Stripe Price ($249.00)
+    period: '6 Months',
+    popular: true,          # This is the one we want to sell most!
     features: [
-      '24/7 Gym Access',
-      'Full equipment access',
-      'unlimited group classes',
-      '1 free PT session per month',
-      'Nutrition consultation',
-      'Access to sauna and spa',
-    ],
-    popular: true
+      '24/7 VIP Gym Access',
+      'Heated Pool, Spa & Sauna',
+      'Priority Padel Booking',
+      '3 Free PT Sessions',
+      '2 Free Body Composition Scans',
+      'Personalized Nutrition Plan',
+      'Guest Pass (2/month)'
+    ]
   },
   {
     name: 'Elite',
-    price: '$99',
-    price_in_cents: 2900,
-    period: 'per month',
+    price: '$499',          # Saves them $89 compared to monthly
+    price_in_cents: 49900,  # Stripe Price ($499.00)
+    period: '1 Year',
+    popular: false,
     features: [
-      '24/7 gym access',
-      'Full equipment access',
-      'Unlimited group classes',
-      '4 PT sessions per month',
-      'Monthly body composition analysis',
-      'Personalized nutrition plan',
-      'Access to all amenities',
-    ],
-    popular: false
+      'All Access (Gym, Pool, Spa, Padel)',
+      '6 Free PT Sessions',
+      'Monthly Body Composition Analysis',
+      'Full Personalized Nutrition Plan',
+      'Unlimited Guest Passes',
+      'Private Locker',
+      'Free Smoothies (1/visit)'
+    ]
   }
 ]
 
