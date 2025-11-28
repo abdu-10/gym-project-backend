@@ -30,7 +30,12 @@ module GymProject
     # 2. Manually add back the middleware for Cookies and Sessions.
     #    (Rails API removes these by default, but we need them for HttpOnly auth).
     config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, key: '_gym_project_session'
+    
+    # --- UPDATED: SET EXPIRATION TO 1 YEAR ---
+    # We added 'expire_after: 1.year' so the PWA stays logged in "forever".
+    config.middleware.use ActionDispatch::Session::CookieStore, 
+      key: '_gym_project_session',
+      expire_after: 1.year 
     
     # 3. Strict protection so other sites can't steal our cookies
     config.action_dispatch.cookies_same_site_protection = :strict
