@@ -9,6 +9,8 @@ class User < ApplicationRecord
 
     has_one :plan, through: :membership
 
+    has_one_attached :profile_photo
+
     # --- NEW: THE "LEGIT" LOGIC ---
   # This calculates if the user is allowed in the gym RIGHT NOW.
   def active_membership?
