@@ -1,18 +1,13 @@
 class RegistrationsController < ApplicationController
-  # This is a JSON API, so we skip this security check
-  skip_before_action :verify_authenticity_token
 
-  # This is the 'create' action we defined in our routes.rb
   def create
-    # 1. Get all our secure, whitelisted data
-    plan_name = registration_params[:plan]
-    account_params = registration_params[:account]
-    payment_params = registration_params[:payment]
+    # --- CHANGE 1: Handle FormData Structure ---
+    # When uploading files, data comes in slightly differently (FormData).
+    # We use params.dig to safely find the values, whether they are JSON or FormData.
     
-    # This is the secret, one-time-use token from React
-    stripe_token = payment_params[:stripe_token]
-    
-    # 2. Find the Plan in our database
+    plan_name = params.dig(:registration, :plan) || params[:plan]
+    stripe_token = params.dig(:registration, :payment, :stripe_token) || params[:stripe_token]
+
     plan = Plan.find_by(name: plan_name)
 
     if plan.nil?
@@ -20,75 +15,69 @@ class RegistrationsController < ApplicationController
       return
     end
 
-    # 3. Make sure we have a token if the method is 'card'
-    #    (This check will be important when we add PayPal/M-Pesa)
-    if payment_params[:method] == 'card' && stripe_token.nil?
+    # --- CHANGE 2: Build Account Data Manually ---
+    # We construct the user data hash manually to ensure we grab the file object correctly.
+    account_data = {
+      name: params.dig(:registration, :account, :name),
+      email: params.dig(:registration, :account, :email),
+      password: params.dig(:registration, :account, :password),
+      password_confirmation: params.dig(:registration, :account, :password_confirmation),
+      profile_photo: params.dig(:registration, :account, :profile_photo) # <--- THIS IS THE PHOTO FILE
+    }
+
+    if params.dig(:registration, :payment, :method) == 'card' && stripe_token.nil?
        render json: { error: "Stripe token not provided." }, status: :unprocessable_entity
        return
     end
 
-    # 4. Start our "safety bubble" transaction
     ActiveRecord::Base.transaction do
-      # 5. Create a new Customer in your Stripe Dashboard
-      #    We use the email from the form and the token as their payment source
-      customer = Stripe::Customer.create(
-        email: account_params[:email],
-        name: account_params[:name],
-        source: stripe_token
-      )
+      # Create the user with the photo
+      @user = User.create!(account_data)
 
-      # 6. CHARGE THE CUSTOMER!
-      #    This uses the customer's new ID and the price_in_cents
-      #    from the plan we found in our database.
-      charge = Stripe::Charge.create(
-        customer: customer.id,
-        amount: plan.price_in_cents, # This is why we added this column!
-        currency: 'usd', # You can change this to 'kes', 'eur', etc.
-        description: "FITELITE - #{plan.name} Membership"
-      )
+      if stripe_token
+        customer = Stripe::Customer.create(
+          email: @user.email,
+          name: @user.name,
+          source: stripe_token
+        )
+        Stripe::Charge.create(
+          customer: customer.id,
+          amount: plan.price_in_cents,
+          currency: 'usd',
+          description: "FITELITE - #{plan.name} Membership"
+        )
+      end
 
-      # 7. If the charge above succeeded, we can now
-      #    create the User in *our* database.
-      @user = User.create!(account_params)
-
-      # --- SECURITY UPGRADE ---
-      # Log them in immediately by setting the cookie
-      session[:user_id] = @user.id
-
-      # 8. And create the Membership to link them.
       @membership = Membership.create!(
         user: @user,
         plan: plan
       )
 
-      # 9. If we get here, EVERYTHING worked!
+      session[:user_id] = @user.id
+
+      # --- CHANGE 3: Generate the Photo URL ---
+      # If a photo was attached, ask Rails for its URL.
+      photo_url = @user.profile_photo.attached? ? url_for(@user.profile_photo) : nil
+
       render json: { 
         message: "User and membership created successfully!",
         user: { 
           id: @user.id, 
           name: @user.name, 
           email: @user.email,
-          joined_at: @user.created_at 
+          joined_at: @user.created_at,
+          photo_url: photo_url # <--- SEND IT BACK TO REACT
         },
         membership: { plan: @membership.plan.name }
       }, status: :created
-    end # End of transaction block
+    end
 
-  # --- NEW ERROR CATCHING ---
-
-  # This catches a "Your card was declined" error from Stripe
   rescue Stripe::CardError => e
     render json: { error: e.message }, status: :unprocessable_entity
-
-  # This catches other Stripe errors (e.g., bad API key)
   rescue Stripe::StripeError => e
     render json: { error: "Payment system error: #{e.message}" }, status: :internal_server_error
-
-  # This catches our validation errors (e.g., "Email has already been taken")
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
-  
-  # This catches any other unexpected crash
   rescue => e
     puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     puts "!!!!!!!!!! REGISTRATION CRASH !!!!!!!!!!"
@@ -98,10 +87,8 @@ class RegistrationsController < ApplicationController
     render json: { error: e.message }, status: :internal_server_error
   end
 
-
   private
 
-  # --- UPDATED PARAMS ---
   def registration_params
     params.require(:registration).permit(
       :plan,
@@ -109,13 +96,14 @@ class RegistrationsController < ApplicationController
         :name,
         :email,
         :password,
-        :password_confirmation
+        :password_confirmation,
+        :profile_photo # <--- CHANGE 4: Permit the photo param
       ],
       payment: [
         :method,
         :nameOnCard,
         :mpesaPhone,
-        :stripe_token  
+        :stripe_token
       ]
     )
   end
