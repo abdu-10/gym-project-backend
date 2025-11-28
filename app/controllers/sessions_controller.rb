@@ -1,21 +1,18 @@
 class SessionsController < ApplicationController
-  # skip_before_action :verify_authenticity_token # Not needed if we use proper CORS/Cookies
+  # skip_before_action :verify_authenticity_token # Not needed if using proper CORS/Cookies
 
   # POST /login
   def create
     user = User.find_by(email: params[:email])
 
     if user&.authenticate(params[:password])
-      
-      # --- SECURITY UPGRADE ---
-      # This saves the ID in an encrypted, HttpOnly cookie.
-      # The browser handles this. React cannot see it.
       session[:user_id] = user.id 
-      # ------------------------
-
+      
+      # --- IMPORTANT: Get the role ---
+      user_role = user.role || 'member' 
       plan_name = user.membership&.plan&.name || "No Plan"
-
-       # --- NEW: Get Photo URL ---
+      
+      # Strict Photo URL
       photo_url = user.profile_photo.attached? ? url_for(user.profile_photo) : nil
 
       render json: {
@@ -24,6 +21,7 @@ class SessionsController < ApplicationController
           id: user.id,
           name: user.name,
           email: user.email,
+          role: user_role, # <--- SENDING ROLE HERE
           plan: plan_name,
           joined_at: user.created_at,
           photo_url: photo_url
@@ -35,27 +33,28 @@ class SessionsController < ApplicationController
   end
 
   # GET /me
-  # This is called when the React app refreshes.
-  # It checks the cookie to see if the user is still logged in.
+  # This runs when you refresh the page
   def me
-    # Check the cookie
     if session[:user_id]
       user = User.find_by(id: session[:user_id])
       
       if user
         plan_name = user.membership&.plan&.name || "No Plan"
+        user_role = user.role || 'member' # <--- GETTING ROLE HERE TOO
+        photo_url = user.profile_photo.attached? ? url_for(user.profile_photo) : nil
+
         render json: {
           user: {
             id: user.id,
             name: user.name,
             email: user.email,
+            role: user_role, # <--- SENDING ROLE HERE
             plan: plan_name,
             joined_at: user.created_at,
             photo_url: photo_url
           }
         }, status: :ok
       else
-        # Cookie existed but user is gone? Clear it.
         session[:user_id] = nil
         render json: { error: "Not logged in" }, status: :unauthorized
       end
