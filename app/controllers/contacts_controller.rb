@@ -1,8 +1,5 @@
 # app/controllers/contacts_controller.rb
 class ContactsController < ApplicationController
-  # We already configured this for testimonials, but it's
-  # good to have here too.
-  skip_before_action :verify_authenticity_token
 
   def create
     # This is where we get the data from the React form
