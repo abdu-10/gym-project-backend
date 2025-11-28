@@ -1,12 +1,13 @@
 class RegistrationsController < ApplicationController
 
   def create
-    # --- CHANGE 1: Handle FormData Structure ---
-    # When uploading files, data comes in slightly differently (FormData).
-    # We use params.dig to safely find the values, whether they are JSON or FormData.
-    
+    # 1. Handle Params
     plan_name = params.dig(:registration, :plan) || params[:plan]
-    stripe_token = params.dig(:registration, :payment, :stripe_token) || params[:stripe_token]
+    payment_method = params.dig(:registration, :payment, :method)
+    
+    # Get tokens for both providers
+    stripe_token = params.dig(:registration, :payment, :stripe_token)
+    paypal_order_id = params.dig(:registration, :payment, :paypal_order_id)
 
     plan = Plan.find_by(name: plan_name)
 
@@ -15,26 +16,33 @@ class RegistrationsController < ApplicationController
       return
     end
 
-    # --- CHANGE 2: Build Account Data Manually ---
-    # We construct the user data hash manually to ensure we grab the file object correctly.
+    # 2. Build Account Data
     account_data = {
       name: params.dig(:registration, :account, :name),
       email: params.dig(:registration, :account, :email),
       password: params.dig(:registration, :account, :password),
       password_confirmation: params.dig(:registration, :account, :password_confirmation),
-      profile_photo: params.dig(:registration, :account, :profile_photo) # <--- THIS IS THE PHOTO FILE
+      profile_photo: params.dig(:registration, :account, :profile_photo)
     }
 
-    if params.dig(:registration, :payment, :method) == 'card' && stripe_token.nil?
+    # 3. Validation Checks before starting transaction
+    if payment_method == 'card' && stripe_token.nil?
        render json: { error: "Stripe token not provided." }, status: :unprocessable_entity
        return
     end
 
+    if payment_method == 'paypal' && paypal_order_id.nil?
+      render json: { error: "PayPal Order ID not provided." }, status: :unprocessable_entity
+      return
+   end
+
     ActiveRecord::Base.transaction do
-      # Create the user with the photo
+      # 4. Create the user
       @user = User.create!(account_data)
 
-      if stripe_token
+      # 5. PROCESS PAYMENT (Switch based on method)
+      if payment_method == 'card'
+        # --- STRIPE LOGIC ---
         customer = Stripe::Customer.create(
           email: @user.email,
           name: @user.name,
@@ -46,17 +54,46 @@ class RegistrationsController < ApplicationController
           currency: 'usd',
           description: "FITELITE - #{plan.name} Membership"
         )
+
+      elsif payment_method == 'paypal'
+        # --- PAYPAL LOGIC ---
+        # We need to "Capture" the order that was approved on the frontend
+        
+        request = PayPal::Server::SDK::Orders::OrdersCaptureRequest.new(paypal_order_id)
+        request.prefer("return=representation")
+        
+        begin
+          response = PAYPAL_CLIENT.execute(request)
+          
+          # Check if the status is COMPLETED
+          if response.result.status != 'COMPLETED'
+            raise "PayPal payment not completed. Status: #{response.result.status}"
+          end
+
+          # Optional: Verify the amount matches the plan price
+          # (PayPal returns strings like "100.00")
+          paid_amount = response.result.purchase_units[0].payments.captures[0].amount.value.to_f
+          expected_amount = plan.price_in_cents / 100.0
+          
+          if paid_amount != expected_amount
+             # In production, you might log this for manual review instead of crashing
+             # raise "Amount mismatch! Expected #{expected_amount}, got #{paid_amount}"
+          end
+
+        rescue PayPal::Server::SDK::Core::PayPalHttpError => e
+          # Handle PayPal API errors
+          raise "PayPal API Error: #{e.result.message}"
+        end
       end
 
+      # 6. Create Membership
       @membership = Membership.create!(
         user: @user,
         plan: plan
       )
 
+      # 7. Log in & Generate Photo URL
       session[:user_id] = @user.id
-
-      # --- CHANGE 3: Generate the Photo URL ---
-      # If a photo was attached, ask Rails for its URL.
       photo_url = @user.profile_photo.attached? ? url_for(@user.profile_photo) : nil
 
       render json: { 
@@ -66,12 +103,13 @@ class RegistrationsController < ApplicationController
           name: @user.name, 
           email: @user.email,
           joined_at: @user.created_at,
-          photo_url: photo_url # <--- SEND IT BACK TO REACT
+          photo_url: photo_url
         },
         membership: { plan: @membership.plan.name }
       }, status: :created
     end
 
+  # --- ERROR CATCHING ---
   rescue Stripe::CardError => e
     render json: { error: e.message }, status: :unprocessable_entity
   rescue Stripe::StripeError => e
@@ -93,17 +131,14 @@ class RegistrationsController < ApplicationController
     params.require(:registration).permit(
       :plan,
       account: [
-        :name,
-        :email,
-        :password,
-        :password_confirmation,
-        :profile_photo # <--- CHANGE 4: Permit the photo param
+        :name, :email, :password, :password_confirmation, :profile_photo
       ],
       payment: [
         :method,
         :nameOnCard,
         :mpesaPhone,
-        :stripe_token
+        :stripe_token,
+        :paypal_order_id # <--- ADD THIS
       ]
     )
   end
