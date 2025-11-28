@@ -15,6 +15,9 @@ class SessionsController < ApplicationController
 
       plan_name = user.membership&.plan&.name || "No Plan"
 
+       # --- NEW: Get Photo URL ---
+      photo_url = user.profile_photo.attached? ? url_for(user.profile_photo) : nil
+
       render json: {
         message: "Logged in successfully!",
         user: {
@@ -22,7 +25,8 @@ class SessionsController < ApplicationController
           name: user.name,
           email: user.email,
           plan: plan_name,
-          joined_at: user.created_at
+          joined_at: user.created_at,
+          photo_url: photo_url
         }
       }, status: :ok
     else
@@ -46,7 +50,8 @@ class SessionsController < ApplicationController
             name: user.name,
             email: user.email,
             plan: plan_name,
-            joined_at: user.created_at
+            joined_at: user.created_at,
+            photo_url: photo_url
           }
         }, status: :ok
       else
