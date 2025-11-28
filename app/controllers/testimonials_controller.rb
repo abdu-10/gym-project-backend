@@ -1,9 +1,6 @@
 # app/controllers/testimonials_controller.rb
 
 class TestimonialsController < ApplicationController
-  # Skip a security check for this simple API.
-  # DO NOT do this in a real app with user authentication
-  skip_before_action :verify_authenticity_token
 
   # Use a before_action to find the testimonial for show, update, and destroy
   before_action :set_testimonial, only: [:show, :update, :destroy]
