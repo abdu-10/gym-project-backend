@@ -8,7 +8,7 @@ module Admin
   class ApplicationController < Administrate::ApplicationController
     before_action :authenticate_admin
     layout "admin"
-    
+
     # Make current_user available to views
     helper_method :current_user
 
@@ -17,7 +17,7 @@ module Admin
         redirect_to admin_login_path, alert: "Please log in as an administrator to continue."
       end
     end
-    
+
     # Inherit from main ApplicationController helpers
     def current_user
       @current_user ||= User.find_by(id: session[:user_id])

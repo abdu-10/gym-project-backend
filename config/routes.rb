@@ -5,10 +5,10 @@ Rails.application.routes.draw do
       get  "login",  to: "sessions#new",     as: :login
       post "login",  to: "sessions#create"
       delete "logout", to: "sessions#destroy", as: :logout
-      
+
       # Dashboard (home)
       get "dashboard", to: "dashboard#index", as: :dashboard
-      
+
       # Resources
       resources :memberships
       resources :plans
@@ -27,7 +27,7 @@ Rails.application.routes.draw do
 
   if Rails.env.development?
   mount LetterOpenerWeb::Engine => "/letter_opener"
-end
+  end
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
@@ -36,13 +36,13 @@ end
   # Simple browser routes for testimonials (no API namespace) — beginner-friendly
   # Visit http://localhost:3000/testimonials
   # Expose simple routes for Postman/browser: list, show, create, delete
- # config/routes.rb
-  resources :testimonials, only: [:index, :show, :create, :update, :destroy]
-  
-resources :contacts, only: [:create]
+  # config/routes.rb
+  resources :testimonials, only: [ :index, :show, :create, :update, :destroy ]
+
+resources :contacts, only: [ :create ]
 
 post "/registrations", to: "registrations#create"
-# The Login Route
+  # The Login Route
   post "/login", to: "sessions#create"
 
   # The Bouncer's Door
