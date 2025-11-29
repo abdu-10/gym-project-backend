@@ -124,3 +124,13 @@ plans_data.each do |plan_data|
 end
 
 puts "Created #{Plan.count} plans."
+
+puts "Creating admin user..."
+admin_password = ENV.fetch('ADMIN_PASSWORD', 'changeme')
+admin = User.find_or_create_by!(email: 'admin@fitelite.com') do |user|
+  user.name = 'Admin'
+  user.password = admin_password
+  user.role = 'admin'
+end
+puts "Admin user created: #{admin.email}"
+puts "Set ADMIN_PASSWORD env var before running seeds (default: changeme)"

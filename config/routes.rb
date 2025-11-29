@@ -1,12 +1,22 @@
 Rails.application.routes.draw do
   get "access/verify"
   namespace :admin do
+      # Admin authentication
+      get  "login",  to: "sessions#new",     as: :login
+      post "login",  to: "sessions#create"
+      delete "logout", to: "sessions#destroy", as: :logout
+
+      # Dashboard (home)
+      get "dashboard", to: "dashboard#index", as: :dashboard
+
+      # Resources
       resources :memberships
       resources :plans
       resources :testimonials
       resources :users
 
-      root to: "memberships#index"
+      # Root goes to dashboard
+      root to: "dashboard#index"
     end
   get "/plans", to: "plans#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -17,7 +27,7 @@ Rails.application.routes.draw do
 
   if Rails.env.development?
   mount LetterOpenerWeb::Engine => "/letter_opener"
-end
+  end
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
@@ -26,13 +36,13 @@ end
   # Simple browser routes for testimonials (no API namespace) — beginner-friendly
   # Visit http://localhost:3000/testimonials
   # Expose simple routes for Postman/browser: list, show, create, delete
- # config/routes.rb
-  resources :testimonials, only: [:index, :show, :create, :update, :destroy]
-  
-resources :contacts, only: [:create]
+  # config/routes.rb
+  resources :testimonials, only: [ :index, :show, :create, :update, :destroy ]
+
+resources :contacts, only: [ :create ]
 
 post "/registrations", to: "registrations#create"
-# The Login Route
+  # The Login Route
   post "/login", to: "sessions#create"
 
   # The Bouncer's Door
