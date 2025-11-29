@@ -41,8 +41,11 @@ post "/registrations", to: "registrations#create"
   # Session Routes
   post "/login", to: "sessions#create"
   delete "/logout", to: "sessions#destroy" # Log out
-  get "/me", to: "sessions#me"             # Check "Who am I?" on refresh
+    get "/me", to: "sessions#me"             # Check "Who am I?" on refresh
 
-  # Defines the root path route ("/")
+    # Admin Stats API (for frontend admin dashboard)
+    get "/admin_stats", to: "admin_stats#show"
+
+    # Defines the root path route ("/")
   # root "posts#index"
 end
