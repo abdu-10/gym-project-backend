@@ -1,12 +1,22 @@
 Rails.application.routes.draw do
   get "access/verify"
   namespace :admin do
+      # Admin authentication
+      get  "login",  to: "sessions#new",     as: :login
+      post "login",  to: "sessions#create"
+      delete "logout", to: "sessions#destroy", as: :logout
+      
+      # Dashboard (home)
+      get "dashboard", to: "dashboard#index", as: :dashboard
+      
+      # Resources
       resources :memberships
       resources :plans
       resources :testimonials
       resources :users
 
-      root to: "memberships#index"
+      # Root goes to dashboard
+      root to: "dashboard#index"
     end
   get "/plans", to: "plans#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
