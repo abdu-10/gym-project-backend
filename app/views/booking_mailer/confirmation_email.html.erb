@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  <style>
+    body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; padding: 20px; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); overflow: hidden; }
+    .header { background-color: #e53e3e; color: #ffffff; padding: 20px; text-align: center; }
+    .content { padding: 30px; line-height: 1.6; }
+    .detail-card { border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-top: 20px; background-color: #f9f9f9; }
+    .detail-card h3 { color: #e53e3e; margin-top: 0; }
+    .footer { text-align: center; padding: 20px; font-size: 12px; color: #777; border-top: 1px solid #eee; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Booking Confirmed!</h1>
+    </div>
+    
+    <div class="content">
+      <p>Hello <%= @user.respond_to?(:name) && @user.name.present? ? @user.name : @user.email %>,</p>
+      
+      <p>Your class booking with FitElite has been successfully confirmed. We look forward to seeing you!</p>
+      
+      <div class="detail-card">
+        <h3>Class Details</h3>
+        <p><strong>Class:</strong> <%= @class.name %></p>
+        <p><strong>Category:</strong> <%= @class.category %></p>
+        <p><strong>Instructor:</strong> <%= @class.instructor %></p>
+        <!-- FIX: Safely parse the string to a Time object before calling strftime -->
+        <p><strong>Date & Time:</strong> <%= Time.parse(@class.time).strftime("%A, %B %d at %I:%M %p") rescue @class.time %></p>
+        <p><strong>Duration:</strong> <%= @class.duration %></p>
+      </div>
+      
+      <p>Please arrive 10-15 minutes early. If you need to cancel, please do so at least 2 hours prior to the start time.</p>
+      
+      <p>Thank you for choosing FitElite!</p>
+    </div>
+    
+    <div class="footer">
+      <p>This is an automated email. Please do not reply.</p>
+    </div>
+  </div>
+</body>
+</html>
