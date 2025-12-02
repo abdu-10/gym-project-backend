@@ -76,3 +76,5 @@ group :test do
 end
 
 gem "administrate", "~> 1.0"
+
+gem 'dotenv-rails', groups: [:development, :test]
