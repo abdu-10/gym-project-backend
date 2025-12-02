@@ -119,6 +119,90 @@ plans_data = [
   }
 ]
 
+# db/seeds.rb
+
+ClassBooking.destroy_all
+
+classes_data = [
+  {
+    name: "HIIT Challenge",
+    category: "Cardio",
+    # Notice the change from 'image' to 'image_url'
+    image_url: "https://images.unsplash.com/photo-1536922246289-88c42f957773?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8SElJVHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
+    duration: "45 mins",
+    instructor: "Alex Johnson",
+    time: "Mon & Wed, Fri 6:00 AM",
+    capacity: 20
+  },
+  {
+    name: "Powerlifting",
+    category: "Strength",
+    image_url: "https://images.unsplash.com/photo-1534368270820-9de3d8053204?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cG93ZXJsaWZ0aW5nfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
+    duration: "60 mins",
+    instructor: "Sarah Lee",
+    time: "Tue & Thu 5:30 PM",
+    capacity: 15
+  },
+  {
+    name: "CrossFit",
+    category: "Strength",
+    image_url: "https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y3Jvc3NmaXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
+    duration: "60 mins",
+    instructor: "Mike Brown",
+    time: "Mon & Wed 7:00 PM",
+    capacity: 25
+  },
+  {
+    name: "Pilates",
+    category: "Flexibility",
+    image_url: "https://images.unsplash.com/photo-1717500251833-d807c5753ded?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTR8fHBpbGF0ZXN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
+    duration: "50 mins",
+    instructor: "Emily Davis",
+    time: "Sat 9:00 AM",
+    capacity: 10
+  },
+  {
+    name: "Zumba",
+    category: "Cardio",
+    image_url: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8enVtYmF8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
+    duration: "55 mins",
+    instructor: "Sophia Wilson",
+    time: "Sun 10:00 AM",
+    capacity: 30
+  },
+  {
+    name: "Yoga Flow",
+    category: "Mind & Body",
+    image_url: "https://plus.unsplash.com/premium_photo-1661371363253-e99d4212ae7f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHlvZ2ElMjBjbGFzc3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
+    duration: "60 mins",
+    instructor: "Olivia Martinez",
+    time: "Daily 8:00 AM",
+    capacity: 20
+  },
+  {
+    name: "Meditation & Mindfulness",
+    category: "Mind & Body",
+    image_url: "https://plus.unsplash.com/premium_photo-1710467003556-0c3576801d86?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8bWVkaXRhdGlvbiUyMGNsYXNzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
+    duration: "30 mins",
+    instructor: "James Smith",
+    time: "Daily 7:00 AM",
+    capacity: 15
+  },
+  {
+    name: "Boxing Basics",
+    category: "Strength",
+    image_url: "https://plus.unsplash.com/premium_photo-1663134170454-ebca105ee9ab?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Ym94aW5nJTIwY2xhc3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
+    duration: "45 mins",
+    instructor: "Alex Johnson",
+    time: "Mon & Wed, Fri 6:00 AM",
+    capacity: 20
+  }
+]
+
+ClassBooking.create!(classes_data)
+
+puts "Created #{ClassBooking.count} ClassBookings"
+
 plans_data.each do |plan_data|
   Plan.create!(plan_data)
 end
