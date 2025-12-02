@@ -1,57 +1,59 @@
 class AccessController < ApplicationController
- 
-  # We add `raise: false` so it doesn't crash if your app is in API mode
   skip_before_action :verify_authenticity_token, raise: false
+  before_action :require_admin
 
-  # POST /access/verify
   def verify
-    user = User.find_by(id: params[:user_id])
+    # The scanner sends the QR content
+    token = params[:user_id]
+    
+    if token.blank?
+      return render json: { status: "error", message: "No QR data received" }, status: :bad_request
+    end
+    # 2. Find User by QR Token
+    # We ONLY look up by the secure random token.
+    # We removed the fallback that checked for ID.
+    # Now, knowing "User ID 13" is useless for access.
+    user = User.find_by(qr_token: token)
 
     if user.nil?
-      render json: { status: "error", message: "User not found" }, status: :not_found
-      return
+      return render json: { status: "denied", error: "Invalid QR Code" }, status: :not_found
     end
 
-    # --- STRICT SECURITY: REAL PHOTO ONLY ---
-    # We removed the avatar generator. 
-    # If they have a photo, we send it. If not, we send nil.
-    # The Security Guard will see "No Pic" on the scanner if this is nil.
-    photo_url = user.profile_photo.attached? ? url_for(user.profile_photo) : nil
-
-    # --- DEBUGGING (Check your Server Terminal when scanning) ---
-    puts "------------------------------------------------"
-    puts "VERIFYING USER: #{user.name} (ID: #{user.id})"
-    
-    if user.membership.nil?
-      puts "FAILURE REASON: User has NO membership record."
-    elsif !user.active_membership?
-      puts "FAILURE REASON: Membership exists but active_membership? returned false."
-      puts "End Date: #{user.membership.end_date}"
-    else
-      puts "SUCCESS: Membership is active."
-    end
-    puts "------------------------------------------------"
-
-    # --- CHECK ACCESS ---
+    # 3. Check Membership & Log Attendance
     if user.active_membership?
-      render json: {
-        status: "granted",
+      
+      Attendance.create!(user: user, checked_in_at: Time.current)
+
+      render json: { 
+        status: "allowed",
+        message: "Access Granted",
         user: {
           name: user.name,
-          plan: user.membership&.plan&.name || "Member",
-          photo: photo_url 
-        }
-      }
-    else
-      render json: {
-        status: "denied",
-        message: "Membership Expired / Inactive",
-        user: {
-          name: user.name,
-          plan: user.membership&.plan&.name || "No Plan",
-          photo: photo_url # We still send the photo so the guard can identify user
+          email: user.email,
+          photo: user.profile_photo.attached? ? url_for(user.profile_photo) : nil,
+          plan: user.plan&.name,
+          visits: user.attendances.count
         }
       }, status: :ok
+
+    else
+      render json: { 
+        status: "denied",
+        error: "Membership Expired / Inactive",
+        user: {
+          name: user.name,
+          plan: user.plan&.name,
+          photo: user.profile_photo.attached? ? url_for(user.profile_photo) : nil
+        }
+      }, status: :ok
+    end
+  end
+
+  private
+
+  def require_admin
+    unless current_user&.role == "admin"
+      render json: { error: "Unauthorized Staff Access" }, status: :unauthorized
     end
   end
 end
