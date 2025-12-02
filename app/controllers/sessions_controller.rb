@@ -15,6 +15,9 @@ class SessionsController < ApplicationController
       # Strict Photo URL
       photo_url = user.profile_photo.attached? ? url_for(user.profile_photo) : nil
 
+      # --- ADDED: Fetch all booked class IDs for the current user ---
+      booked_class_ids = user.bookings.pluck(:class_booking_id)
+
       render json: {
         message: "Logged in successfully!",
         user: {
@@ -24,7 +27,8 @@ class SessionsController < ApplicationController
           role: user_role, # <--- SENDING ROLE HERE
           plan: plan_name,
           joined_at: user.created_at,
-          photo_url: photo_url
+          photo_url: photo_url,
+          booked_class_ids: booked_class_ids # <-- NEW ADDITION
         }
       }, status: :ok
     else
@@ -43,6 +47,9 @@ class SessionsController < ApplicationController
         user_role = user.role || 'member' # <--- GETTING ROLE HERE TOO
         photo_url = user.profile_photo.attached? ? url_for(user.profile_photo) : nil
 
+        # --- ADDED: Fetch all booked class IDs for the current user ---
+        booked_class_ids = user.bookings.pluck(:class_booking_id)
+
         render json: {
           user: {
             id: user.id,
@@ -51,7 +58,8 @@ class SessionsController < ApplicationController
             role: user_role, # <--- SENDING ROLE HERE
             plan: plan_name,
             joined_at: user.created_at,
-            photo_url: photo_url
+            photo_url: photo_url,
+            booked_class_ids: booked_class_ids # <-- NEW ADDITION
           }
         }, status: :ok
       else
