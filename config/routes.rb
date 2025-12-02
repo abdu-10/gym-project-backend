@@ -38,6 +38,12 @@ post "/registrations", to: "registrations#create"
   # The Bouncer's Door
   post "/access/verify", to: "access#verify"
 
+  # Classes Routes
+  resources :classes, only: [:index, :show, :create]
+  
+
+  resources :bookings, only: [:create, :destroy]
+
   # Session Routes
   post "/login", to: "sessions#create"
   delete "/logout", to: "sessions#destroy" # Log out
@@ -45,6 +51,14 @@ post "/registrations", to: "registrations#create"
 
     # Admin Stats API (for frontend admin dashboard)
     get "/admin_stats", to: "admin_stats#show"
+
+   #forgot password routes 
+  post '/password_resets', to: 'password_resets#create'
+  put '/password_resets/update', to: 'password_resets#update'
+
+  get '/member_dashboard', to: 'members_dashboard#show'
+
+
 
     # Defines the root path route ("/")
   # root "posts#index"
