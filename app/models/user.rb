@@ -11,7 +11,16 @@ class User < ApplicationRecord
 
     has_one_attached :profile_photo
 
-    # --- NEW: THE "LEGIT" LOGIC ---
+    has_secure_token :qr_token 
+
+     has_many :attendances, dependent: :destroy 
+
+    has_many :payments, dependent: :destroy
+
+    # New booking associations
+  has_many :bookings, dependent: :destroy
+  has_many :booked_classes, through: :bookings, source: :class_booking
+
   # This calculates if the user is allowed in the gym RIGHT NOW.
   def active_membership?
     return false unless membership.present?
