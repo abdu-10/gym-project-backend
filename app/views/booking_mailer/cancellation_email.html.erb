@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  <style>
+    /* Global Reset and Base Styles */
+    body { 
+        font-family: 'Arial', sans-serif; 
+        background-color: #f0f4f8; /* Light blue-gray background */
+        padding: 20px; 
+        color: #1f2937; /* Dark gray text */
+        line-height: 1.6;
+    }
+    /* Main Container */
+    .container { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background-color: #ffffff; 
+        border-radius: 12px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* Soft shadow */
+        overflow: hidden; 
+    }
+    /* Header Section */
+    .header { 
+        background-color: #374151; /* Darker header background */
+        color: #ffffff; 
+        padding: 30px 20px; 
+        text-align: center; 
+    }
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+    /* Content Section */
+    .content { 
+        padding: 30px; 
+    }
+    .content p {
+        margin-bottom: 15px;
+    }
+    /* Class Details Card */
+    .detail-card { 
+        border: 1px solid #d1d5db; 
+        border-radius: 8px; 
+        padding: 20px; 
+        margin: 25px 0; 
+        background-color: #f9fafb; /* Very light background for contrast */
+    }
+    .detail-card h3 { 
+        color: #10b981; /* Accent color for the heading (Green/Teal) */
+        margin-top: 0; 
+        border-bottom: 2px solid #10b981;
+        padding-bottom: 5px;
+        font-size: 18px;
+    }
+    .detail-card strong {
+        color: #374151;
+        display: inline-block;
+        min-width: 100px;
+    }
+    /* Footer Section */
+    .footer { 
+        text-align: center; 
+        padding: 20px; 
+        font-size: 11px; 
+        color: #9ca3af; /* Light gray footer text */
+        border-top: 1px solid #e5e7eb; 
+        margin-top: 20px; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Cancellation Confirmed</h1>
+    </div>
+    
+    <div class="content">
+      <!-- Safely use .name or fall back to email -->
+      <p>Hello <%= @user.name || @user.email %>,</p>
+      
+      <p>This email confirms that your booking for the following class has been successfully **cancelled**.</p>
+      
+      <div class="detail-card">
+        <h3>Class Details</h3>
+        <p><strong>Class:</strong> <%= @class.name %></p>
+        <p><strong>Category:</strong> <%= @class.category %></p>
+        <p><strong>Instructor:</strong> <%= @class.instructor %></p>
+        <!-- FIXED: Safely parse the string to a Time object -->
+        <p><strong>Scheduled Time:</strong> <%= Time.parse(@class.time).strftime("%A, %B %d at %I:%M %p") rescue @class.time %></p>
+      </div>
+      
+      <p>The spot is now available for other members. We appreciate you cancelling in advance, and we hope to see you at another class soon!</p>
+      
+      <p>Thank you,<br>The FitElite Team</p>
+    </div>
+    
+    <div class="footer">
+      <p>FitElite Gym | This is an automated notification. Please do not reply.</p>
+    </div>
+  </div>
+</body>
+</html>
