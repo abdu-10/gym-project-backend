@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f0f4f8; padding: 20px; color: #1f2937; line-height: 1.6; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #fff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+    .header { background-color: #374151; color: #fff; padding: 30px 20px; text-align: center; }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+    .content { padding: 30px; }
+    .content p { margin-bottom: 15px; }
+    .detail-card { border: 1px solid #d1d5db; border-radius: 8px; padding: 20px; margin: 25px 0; background-color: #f9fafb; }
+    .detail-card h3 { color: #10b981; margin-top: 0; border-bottom: 2px solid #10b981; padding-bottom: 5px; font-size: 18px; }
+    .detail-card strong { color: #374151; display: inline-block; min-width: 100px; }
+    .footer { text-align: center; padding: 20px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Trainer Booking Confirmed!</h1>
+    </div>
+
+    <div class="content">
+      <p>Hello <%= @booking[:user_name] || @booking[:user_email] %>,</p>
+
+      <p>Your request to book a session with your trainer has been successfully received. Here are your booking details:</p>
+
+      <div class="detail-card">
+        <h3>Trainer Details</h3>
+        <p><strong>Trainer:</strong> <%= @booking[:trainer_name] %></p>
+        <p><strong>Email:</strong> <%= @booking[:user_email] %></p>
+        <% if @booking[:user_phone].present? %>
+          <p><strong>Phone:</strong> <%= @booking[:user_phone] %></p>
+        <% end %>
+        <% if @booking[:preferred_date].present? %>
+          <p><strong>Preferred Date:</strong> <%= @booking[:preferred_date] %></p>
+        <% end %>
+        <% if @booking[:goals_message].present? %>
+          <p><strong>Goals/Message:</strong> <%= @booking[:goals_message] %></p>
+        <% end %>
+      </div>
+
+      <p>Our team will review your request and get back to you shortly to confirm the session. Thank you for choosing FitElite!</p>
+
+      <p>Best regards,<br>The FitElite Team</p>
+    </div>
+
+    <div class="footer">
+      <p>FitElite Gym | This is an automated notification. Please do not reply.</p>
+    </div>
+  </div>
+</body>
+</html>
