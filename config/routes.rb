@@ -59,7 +59,7 @@ post "/registrations", to: "registrations#create"
   get '/member_dashboard', to: 'members_dashboard#show'
 
 
-
+  resources :trainer_bookings, only: [:create]
     # Defines the root path route ("/")
   # root "posts#index"
 end
