@@ -17,6 +17,9 @@ class User < ApplicationRecord
 
     has_many :payments, dependent: :destroy
 
+    # Add this line to link users to their trainer booking history
+    has_many :trainer_bookings, dependent: :destroy
+
     # New booking associations
   has_many :bookings, dependent: :destroy
   has_many :booked_classes, through: :bookings, source: :class_booking
