@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  trainer_name: MyString
+  user_name: MyString
+  user_email: MyString
+  user_phone: MyString
+  preferred_date: 2025-12-07
+  goals_message: MyText
+  status: MyString
+
+two:
+  user: two
+  trainer_name: MyString
+  user_name: MyString
+  user_email: MyString
+  user_phone: MyString
+  preferred_date: 2025-12-07
+  goals_message: MyText
+  status: MyString
