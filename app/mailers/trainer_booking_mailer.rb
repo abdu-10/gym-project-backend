@@ -15,12 +15,18 @@ class TrainerBookingMailer < ApplicationMailer
                  {}
                end
 
-    # If user_email not present in the normalized payload, try association on model
-    if @booking[:user_email].blank? && raw.respond_to?(:user) && raw.user.respond_to?(:email)
-      @booking[:user_email] = raw.user.email
+    # Extract user data from association if available
+    if raw.respond_to?(:user) && raw.user.present?
+      @booking[:user_email] ||= raw.user.email
+      @booking[:user_name] ||= raw.user.name
     end
 
-    # If still missing, log and exit gracefully
+    # Format preferred_time if it's a Time object
+    if @booking[:preferred_time].present? && @booking[:preferred_time].is_a?(Time)
+      @booking[:preferred_time] = @booking[:preferred_time].strftime('%H:%M')
+    end
+
+    # If still missing email, log and exit gracefully
     unless @booking[:user_email].present?
       Rails.logger.warn "TrainerBookingMailer: No user_email provided, skipping email. booking=#{raw.inspect}" 
       return
@@ -30,7 +36,7 @@ class TrainerBookingMailer < ApplicationMailer
 
     mail(
       to: @booking[:user_email],
-      subject: "Trainer Booking Confirmation"
+      subject: "Trainer Booking Confirmation - FitElite"
     )
   rescue StandardError => e
     # Catch mailer errors so they don't break your controller response
