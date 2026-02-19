@@ -41,6 +41,9 @@ post "/registrations", to: "registrations#create"
   # Classes Routes
   resources :classes, only: [:index, :show, :create]
   
+  # Trainers Routes
+  resources :trainers, only: [:index, :show]
+  get "/trainers/:trainer_id/available_slots", to: "trainers#available_slots"
 
   resources :bookings, only: [:create, :destroy]
 
