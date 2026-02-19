@@ -6,6 +6,54 @@
 
 puts "Cleaning database..."
 Testimonial.destroy_all
+Trainer.destroy_all
+
+puts "Creating trainers..."
+
+trainers_data = [
+  {
+    name: "Hamudi Omar",
+    role: "Strength Coach",
+    image: "https://images.unsplash.com/photo-1694856872516-b89f1a9195d7?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE5fHx8ZW58MHx8fHx8&auto=format&fit=crop&q=60&w=600",
+    bio: "With 10 years of experience, Hamudi specializes in Powerlifting, and functional training. He is dedicated to helping clients build strength, improve performance, and achieve their fitness goals.",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+    twitter: "https://twitter.com"
+  },
+  {
+    name: "Mama Shawn",
+    role: "Yoga Instructor",
+    image: "https://images.unsplash.com/photo-1762021441225-8ac79c29f317?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1026",
+    bio: "Mama Shawn is a certified yoga instructor with a passion for mindfulness and holistic wellness. She leads classes that cater to all levels, from beginners to advanced practitioners.",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+    twitter: "https://twitter.com"
+  },
+  {
+    name: "Douglas Omilana",
+    role: "Personal Trainer",
+    image: "https://plus.unsplash.com/premium_photo-1665461700538-0e790cf7bab8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDR8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=600",
+    bio: "Douglas is a dedicated personal trainer who creates customized workout plans to help clients achieve their fitness goals, whether it's weight loss, muscle gain, or overall health improvement.",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+    twitter: "https://twitter.com"
+  },
+  {
+    name: "Andilaman Omar",
+    role: "Cardio Specialist",
+    image: "https://images.unsplash.com/photo-1704223523169-52feeed90365?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHBlcnNvbmFsJTIwdHJhaW5lcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
+    bio: "Omar is a cardio specialist with a focus on high-intensity interval training (HIIT) and endurance workouts. He helps clients improve their cardiovascular fitness and achieve their weight loss goals.",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+    twitter: "https://twitter.com"
+  }
+]
+
+trainers_data.each do |data|
+  Trainer.create!(data)
+end
+
+puts "Created #{Trainer.count} trainers."
 
 puts "Creating testimonials..."
 
