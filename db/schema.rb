@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_18_122856) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_19_041954) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -131,10 +131,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_18_122856) do
   create_table "trainers", force: :cascade do |t|
     t.text "bio"
     t.datetime "created_at", null: false
+    t.string "email"
     t.string "facebook"
     t.string "image"
     t.string "instagram"
     t.string "name"
+    t.string "phone"
     t.string "role"
     t.string "twitter"
     t.datetime "updated_at", null: false
