@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_07_161334) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_18_122856) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -116,7 +116,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_07_161334) do
     t.datetime "created_at", null: false
     t.text "goals_message"
     t.date "preferred_date"
+    t.time "preferred_time"
     t.string "status"
+    t.integer "trainer_id"
     t.string "trainer_name"
     t.datetime "updated_at", null: false
     t.string "user_email"
@@ -124,6 +126,18 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_07_161334) do
     t.string "user_name"
     t.string "user_phone"
     t.index ["user_id"], name: "index_trainer_bookings_on_user_id"
+  end
+
+  create_table "trainers", force: :cascade do |t|
+    t.text "bio"
+    t.datetime "created_at", null: false
+    t.string "facebook"
+    t.string "image"
+    t.string "instagram"
+    t.string "name"
+    t.string "role"
+    t.string "twitter"
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -145,5 +159,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_07_161334) do
   add_foreign_key "memberships", "plans"
   add_foreign_key "memberships", "users"
   add_foreign_key "payments", "users"
+  add_foreign_key "trainer_bookings", "trainers"
   add_foreign_key "trainer_bookings", "users"
 end
