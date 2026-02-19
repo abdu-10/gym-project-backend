@@ -17,8 +17,16 @@ class TrainerBookingsController < ApplicationController
     end
 
     if @booking.save
-      # Send confirmation email asynchronously
+      # Send confirmation email to user asynchronously
       TrainerBookingMailer.with(booking: @booking).confirmation_email.deliver_later
+
+      # Send notification email to trainer asynchronously
+      trainer = Trainer.find_by(id: @booking.trainer_id)
+      if trainer.present?
+        TrainerBookingMailer.with(booking: @booking, trainer: trainer).trainer_notification_email.deliver_later
+      else
+        Rails.logger.warn "TrainerBookingsController: Trainer not found for booking (trainer_id: #{@booking.trainer_id})"
+      end
 
       render json: {
         message: "Booking created successfully!",
