@@ -7,14 +7,15 @@
 puts "Cleaning database..."
 Testimonial.destroy_all
 TrainerBooking.destroy_all
-Trainer.destroy_all
+User.destroy_all  # This will cascade destroy trainers with dependent: :destroy
 
-puts "Creating trainers..."
+# Create trainer users first
+puts "Creating trainer users..."
 
-trainers_data = [
+trainers_info = [
   {
     name: "Hamudi Omar",
-    role: "Strength Coach",
+    role_title: "Strength Coach",
     email: "abduomar356+fitelite+hamudi@gmail.com",
     phone: "254712345001",
     image: "https://images.unsplash.com/photo-1694856872516-b89f1a9195d7?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE5fHx8ZW58MHx8fHx8&auto=format&fit=crop&q=60&w=600",
@@ -25,7 +26,7 @@ trainers_data = [
   },
   {
     name: "Mama Shawn",
-    role: "Yoga Instructor",
+    role_title: "Yoga Instructor",
     email: "abduomar356+fitelite+mamashawn@gmail.com",
     phone: "254712345002",
     image: "https://images.unsplash.com/photo-1762021441225-8ac79c29f317?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1026",
@@ -36,7 +37,7 @@ trainers_data = [
   },
   {
     name: "Douglas Omilana",
-    role: "Personal Trainer",
+    role_title: "Personal Trainer",
     email: "abduomar356+fitelite+douglas@gmail.com",
     phone: "254712345003",
     image: "https://plus.unsplash.com/premium_photo-1665461700538-0e790cf7bab8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDR8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=600",
@@ -47,7 +48,7 @@ trainers_data = [
   },
   {
     name: "Andilaman Omar",
-    role: "Cardio Specialist",
+    role_title: "Cardio Specialist",
     email: "abduomar356+fitelite+andilaman@gmail.com",
     phone: "254712345004",
     image: "https://images.unsplash.com/photo-1704223523169-52feeed90365?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHBlcnNvbmFsJTIwdHJhaW5lcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
@@ -58,11 +59,40 @@ trainers_data = [
   }
 ]
 
-trainers_data.each do |data|
-  Trainer.create!(data)
+# Create trainer users and their profiles
+trainers_info.each do |trainer_info|
+  begin
+    # Create/find trainer user
+    trainer_user = User.find_or_create_by(email: trainer_info[:email]) do |u|
+      u.name = trainer_info[:name]
+      u.password = 'Trainer@123456'
+      u.role = 'trainer'
+    end
+    
+    # Verify user was created
+    puts "  Created trainer user: #{trainer_user.id} - #{trainer_user.email}"
+
+    # Create trainer profile linked to user
+    trainer = Trainer.create!(
+      name: trainer_info[:name],
+      role: trainer_info[:role_title],
+      email: trainer_info[:email],
+      phone: trainer_info[:phone],
+      image: trainer_info[:image],
+      bio: trainer_info[:bio],
+      instagram: trainer_info[:instagram],
+      facebook: trainer_info[:facebook],
+      twitter: trainer_info[:twitter],
+      user_id: trainer_user.id
+    )
+    puts "  Created trainer profile: #{trainer.id} - #{trainer.name}"
+  rescue => e
+    puts "  ERROR creating trainer: #{e.message}"
+    puts "    #{e.backtrace.first}"
+  end
 end
 
-puts "Created #{Trainer.count} trainers."
+puts "Created #{Trainer.count} trainers and #{User.where(role: 'trainer').count} trainer users."
 
 puts "Creating testimonials..."
 
@@ -118,8 +148,6 @@ puts "Created #{Testimonial.count} testimonials."
 
 puts "Cleaning join tables..."
 Membership.destroy_all
-User.destroy_all # Let's also clean up the Postman test user
-
 
 puts "Cleaning Plans table..."
 Plan.destroy_all
