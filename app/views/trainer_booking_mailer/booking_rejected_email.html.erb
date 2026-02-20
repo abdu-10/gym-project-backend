@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .header {
+      background: linear-gradient(135deg, #e63946 0%, #c92a2a 100%);
+      color: #ffffff;
+      padding: 44px 24px 40px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .header p {
+      margin: 8px 0 0 0;
+      font-size: 14px;
+      opacity: 0.95;
+    }
+    .content {
+      padding: 32px 26px 10px;
+    }
+    .lead {
+      margin: 0 0 18px 0;
+      font-size: 15px;
+      color: #374151;
+    }
+    .section {
+      margin-bottom: 22px;
+      padding: 18px;
+      background-color: #f8f9fa;
+      border-left: 4px solid #e63946;
+      border-radius: 6px;
+    }
+    .section h3 {
+      margin: 0 0 10px 0;
+      color: #e63946;
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .row:last-child {
+      border-bottom: none;
+    }
+    .label {
+      color: #6b7280;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .value {
+      color: #111827;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .note {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 6px 0 24px 0;
+      color: #374151;
+      font-size: 14px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      padding: 20px 20px 26px;
+    }
+    @media (max-width: 600px) {
+      .row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Booking Update</h1>
+      <p>Your request could not be accepted</p>
+    </div>
+
+    <div class="content">
+      <p class="lead">
+        Your trainer is unfortunately not available at this time. Please try a different time slot or choose another trainer.
+      </p>
+      <div class="section">
+        <h3>Session Details</h3>
+        <div class="row">
+          <div class="label">Trainer</div>
+          <div class="value"><%= @trainer&.name || @booking[:trainer_name] || "Your Trainer" %></div>
+        </div>
+        <div class="row">
+          <div class="label">Date</div>
+          <div class="value"><%= @booking[:preferred_date] || "TBD" %></div>
+        </div>
+        <div class="row">
+          <div class="label">Time</div>
+          <div class="value"><%= @booking[:preferred_time] || "TBD" %></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Next Step</h3>
+        <div class="value">
+          Open the FitElite app to select another available time or trainer.
+        </div>
+      </div>
+
+      <div class="note">
+        We are here to help you reach your goals. If you need assistance, reply to this email.
+      </div>
+    </div>
+
+    <div class="footer">
+      We are here to help you reach your goals. Try another slot anytime.
+    </div>
+  </div>
+</body>
+</html>
