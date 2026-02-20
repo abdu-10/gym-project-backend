@@ -3,6 +3,141 @@ class TrainerBookingsController < ApplicationController
   # Require user to be logged in
   before_action :require_login
 
+  # GET /trainer_bookings?user_id={id}  - Get bookings for a client
+  # GET /trainer_bookings?trainer_user_id={id} - Get bookings for a trainer (their sessions)
+  # Fetch all bookings with trainer details
+  def index
+    # Support both user_id (for clients) and trainer_user_id (for trainers)
+    if params[:trainer_user_id]
+      # Trainer dashboard - show all bookings for this trainer's sessions
+      trainer_user_id = params[:trainer_user_id]
+      
+      unless trainer_user_id
+        return render json: { error: "trainer_user_id parameter is required" }, status: :bad_request
+      end
+      
+      bookings = TrainerBooking.for_trainer_user(trainer_user_id).includes(:trainer, :user).order(preferred_date: :asc, preferred_time: :asc)
+      
+      bookings_data = bookings.map do |booking|
+        {
+          id: booking.id,
+          user_name: booking.user&.name,
+          user_email: booking.user&.email,
+          trainer_name: booking.trainer&.name || booking.trainer_name,
+          trainer_email: booking.trainer&.email,
+          trainer_phone: booking.trainer&.phone,
+          trainer_image: booking.trainer&.image,
+          trainer_role: booking.trainer&.role,
+          preferred_date: booking.preferred_date,
+          preferred_time: booking.preferred_time&.strftime('%H:%M'),
+          goals_message: booking.goals_message,
+          status: booking.status || 'pending',
+          created_at: booking.created_at,
+          updated_at: booking.updated_at
+        }
+      end
+    else
+      # Client dashboard - show bookings for this user
+      user_id = params[:user_id] || current_user&.id
+
+      unless user_id
+        return render json: { error: "user_id parameter is required" }, status: :bad_request
+      end
+
+      bookings = TrainerBooking.includes(:trainer).where(user_id: user_id).order(created_at: :desc)
+
+      bookings_data = bookings.map do |booking|
+        {
+          id: booking.id,
+          trainer_name: booking.trainer&.name || booking.trainer_name,
+          trainer_email: booking.trainer&.email,
+          trainer_phone: booking.trainer&.phone,
+          trainer_image: booking.trainer&.image,
+          trainer_role: booking.trainer&.role,
+          preferred_date: booking.preferred_date,
+          preferred_time: booking.preferred_time&.strftime('%H:%M'),
+          goals_message: booking.goals_message,
+          status: booking.status || 'pending',
+          created_at: booking.created_at,
+          updated_at: booking.updated_at
+        }
+      end
+    end
+
+    render json: { trainer_bookings: bookings_data }, status: :ok
+  end
+
+  # PATCH /trainer_bookings/:id
+  # Cancel a booking by setting status to 'cancelled'
+  def update
+    booking = TrainerBooking.find_by(id: params[:id])
+
+    unless booking
+      return render json: { error: "Booking not found" }, status: :not_found
+    end
+
+    status = params[:status] || params.dig(:trainer_booking, :status)
+
+    if status.blank?
+      return render json: { error: "status parameter is required" }, status: :bad_request
+    end
+
+    is_booking_owner = booking.user_id == current_user&.id
+    is_trainer_owner = booking.trainer&.user_id == current_user&.id
+
+    case status
+    when 'cancelled'
+      unless is_booking_owner
+        return render json: { error: "Unauthorized to modify this booking" }, status: :forbidden
+      end
+    when 'confirmed', 'accepted', 'rejected'
+      unless is_trainer_owner
+        return render json: { error: "Unauthorized to modify this booking" }, status: :forbidden
+      end
+    else
+      return render json: { error: "Unsupported status" }, status: :bad_request
+    end
+
+    booking.status = (status == 'accepted' ? 'confirmed' : status)
+
+    if booking.save
+      if status == 'cancelled'
+        # Send cancellation notification to trainer asynchronously
+        trainer = Trainer.find_by(id: booking.trainer_id)
+        if trainer.present?
+          TrainerBookingMailer.with(booking: booking, trainer: trainer).trainer_cancellation_email.deliver_later
+        else
+          Rails.logger.warn "TrainerBookingsController: Trainer not found for cancellation (trainer_id: #{booking.trainer_id})"
+        end
+      elsif booking.status == 'confirmed'
+        trainer = booking.trainer
+        if trainer.present?
+          TrainerBookingMailer.with(booking: booking, trainer: trainer).booking_confirmed_email.deliver_later
+        else
+          Rails.logger.warn "TrainerBookingsController: Trainer not found for confirmation (trainer_id: #{booking.trainer_id})"
+        end
+      elsif booking.status == 'rejected'
+        trainer = booking.trainer
+        if trainer.present?
+          TrainerBookingMailer.with(booking: booking, trainer: trainer).booking_rejected_email.deliver_later
+        else
+          Rails.logger.warn "TrainerBookingsController: Trainer not found for rejection (trainer_id: #{booking.trainer_id})"
+        end
+      end
+
+      render json: {
+        message: "Booking updated successfully",
+        booking: {
+          id: booking.id,
+          status: booking.status,
+          updated_at: booking.updated_at
+        }
+      }, status: :ok
+    else
+      render json: { errors: booking.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   def create
     # Use current_user (must be logged in)
     user = current_user
