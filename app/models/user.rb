@@ -20,6 +20,9 @@ class User < ApplicationRecord
     # Add this line to link users to their trainer booking history
     has_many :trainer_bookings, dependent: :destroy
 
+    # Trainer profile association (if this user is a trainer)
+    has_one :trainer_profile, class_name: 'Trainer', foreign_key: 'user_id', dependent: :destroy
+
     # New booking associations
   has_many :bookings, dependent: :destroy
   has_many :booked_classes, through: :bookings, source: :class_booking
