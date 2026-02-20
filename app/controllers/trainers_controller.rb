@@ -1,12 +1,12 @@
 class TrainersController < ApplicationController
   def index
-    @trainers = Trainer.all
-    render json: @trainers
+    trainers = Trainer.all
+    render json: trainers.map { |trainer| trainer_payload(trainer) }
   end
 
   def show
-    @trainer = Trainer.find(params[:id])
-    render json: @trainer
+    trainer = Trainer.find(params[:id])
+    render json: trainer_payload(trainer)
   end
 
   def available_slots
@@ -23,5 +23,25 @@ class TrainersController < ApplicationController
     rescue StandardError => e
       render json: { error: e.message }, status: :bad_request
     end
+  end
+
+  private
+
+  def trainer_payload(trainer)
+    {
+      trainer_id: trainer.id,
+      trainer_user_id: trainer.user_id,
+      name: trainer.name,
+      role: trainer.role,
+      email: trainer.email,
+      phone: trainer.phone,
+      image: trainer.image,
+      bio: trainer.bio,
+      instagram: trainer.instagram,
+      facebook: trainer.facebook,
+      twitter: trainer.twitter,
+      created_at: trainer.created_at,
+      updated_at: trainer.updated_at
+    }
   end
 end
