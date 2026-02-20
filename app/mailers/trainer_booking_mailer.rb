@@ -114,4 +114,132 @@ class TrainerBookingMailer < ApplicationMailer
   rescue StandardError => e
     Rails.logger.error "TrainerBookingMailer trainer notification error: #{e.message}"
   end
+
+  # Sends a notification email to trainer about a cancelled booking
+  # Usage: TrainerBookingMailer.with(booking: booking_obj, trainer: trainer_obj).trainer_cancellation_email.deliver_later
+  def trainer_cancellation_email
+    raw_booking = params[:booking]
+    trainer_obj = params[:trainer]
+
+    # Normalize booking data
+    @booking = if raw_booking.respond_to?(:symbolize_keys)
+                 raw_booking.symbolize_keys
+               elsif raw_booking.respond_to?(:attributes)
+                 raw_booking.attributes.symbolize_keys
+               else
+                 {}
+               end
+
+    # Extract user data from association if available
+    if raw_booking.respond_to?(:user) && raw_booking.user.present?
+      @booking[:user_name] ||= raw_booking.user.name
+      @booking[:user_email] ||= raw_booking.user.email
+    end
+
+    # Format preferred_time if it's a Time object
+    if @booking[:preferred_time].present? && @booking[:preferred_time].is_a?(Time)
+      @booking[:preferred_time] = @booking[:preferred_time].strftime('%H:%M')
+    end
+
+    # Get trainer information
+    @trainer = if trainer_obj.respond_to?(:email)
+                 trainer_obj
+               else
+                 nil
+               end
+
+    # Skip if trainer email is missing
+    unless @trainer&.email.present?
+      Rails.logger.warn "TrainerBookingMailer: No trainer email provided, skipping trainer cancellation. booking=#{raw_booking.inspect}"
+      return
+    end
+
+    Rails.logger.info "Preparing trainer cancellation notification email for trainer #{@trainer.email} (User: #{@booking[:user_name]})"
+
+    # Extract user name for subject line
+    user_name = @booking[:user_name] || "Client"
+
+    mail(
+      to: @trainer.email,
+      subject: "Booking Cancelled by #{user_name}"
+    )
+  rescue StandardError => e
+    Rails.logger.error "TrainerBookingMailer trainer cancellation error: #{e.message}"
+  end
+
+  # Sends a confirmation email to user when trainer accepts the booking
+  # Usage: TrainerBookingMailer.with(booking: booking_obj, trainer: trainer_obj).booking_confirmed_email.deliver_later
+  def booking_confirmed_email
+    raw_booking = params[:booking]
+    trainer_obj = params[:trainer]
+
+    @booking = if raw_booking.respond_to?(:symbolize_keys)
+                 raw_booking.symbolize_keys
+               elsif raw_booking.respond_to?(:attributes)
+                 raw_booking.attributes.symbolize_keys
+               else
+                 {}
+               end
+
+    if raw_booking.respond_to?(:user) && raw_booking.user.present?
+      @booking[:user_name] ||= raw_booking.user.name
+      @booking[:user_email] ||= raw_booking.user.email
+    end
+
+    if @booking[:preferred_time].present? && @booking[:preferred_time].is_a?(Time)
+      @booking[:preferred_time] = @booking[:preferred_time].strftime('%H:%M')
+    end
+
+    @trainer = trainer_obj if trainer_obj.respond_to?(:name)
+
+    unless @booking[:user_email].present?
+      Rails.logger.warn "TrainerBookingMailer: No user_email provided for confirmation, skipping email."
+      return
+    end
+
+    mail(
+      to: @booking[:user_email],
+      subject: "Booking Confirmed - FitElite"
+    )
+  rescue StandardError => e
+    Rails.logger.error "TrainerBookingMailer booking confirmed error: #{e.message}"
+  end
+
+  # Sends a rejection email to user when trainer declines the booking
+  # Usage: TrainerBookingMailer.with(booking: booking_obj, trainer: trainer_obj).booking_rejected_email.deliver_later
+  def booking_rejected_email
+    raw_booking = params[:booking]
+    trainer_obj = params[:trainer]
+
+    @booking = if raw_booking.respond_to?(:symbolize_keys)
+                 raw_booking.symbolize_keys
+               elsif raw_booking.respond_to?(:attributes)
+                 raw_booking.attributes.symbolize_keys
+               else
+                 {}
+               end
+
+    if raw_booking.respond_to?(:user) && raw_booking.user.present?
+      @booking[:user_name] ||= raw_booking.user.name
+      @booking[:user_email] ||= raw_booking.user.email
+    end
+
+    if @booking[:preferred_time].present? && @booking[:preferred_time].is_a?(Time)
+      @booking[:preferred_time] = @booking[:preferred_time].strftime('%H:%M')
+    end
+
+    @trainer = trainer_obj if trainer_obj.respond_to?(:name)
+
+    unless @booking[:user_email].present?
+      Rails.logger.warn "TrainerBookingMailer: No user_email provided for rejection, skipping email."
+      return
+    end
+
+    mail(
+      to: @booking[:user_email],
+      subject: "Booking Update - FitElite"
+    )
+  rescue StandardError => e
+    Rails.logger.error "TrainerBookingMailer booking rejected error: #{e.message}"
+  end
 end
