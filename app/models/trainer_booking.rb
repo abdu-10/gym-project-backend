@@ -2,6 +2,11 @@ class TrainerBooking < ApplicationRecord
   belongs_to :user
   belongs_to :trainer, class_name: 'Trainer', foreign_key: 'trainer_id', optional: true
 
+  # Scopes for filtering bookings
+  scope :for_trainer_user, ->(trainer_user_id) {
+    joins(:trainer).where(trainers: { user_id: trainer_user_id })
+  }
+
   # Default available time slots (hourly intervals from 6 AM to 9 PM)
   DEFAULT_TIME_SLOTS = [
     "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00",
